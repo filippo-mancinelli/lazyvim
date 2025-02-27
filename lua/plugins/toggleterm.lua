@@ -11,11 +11,13 @@ return {
       float_opts = {
         border = "curved",
       },
+      -- Explicitly set the correct directions
+      direction = "float", -- Default direction
     })
 
-    -- Function to set terminal direction
+    -- Function to set terminal keymaps
     local function set_terminal_keymaps()
-      vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+      vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true, nowait = true })
     end
 
     -- Create an autocmd that will run when the terminal opens
@@ -35,14 +37,34 @@ return {
       direction = "float",
       hidden = true,
       count = 1,
+      -- Set current working directory
+      cwd = vim.fn.getcwd(),
     })
 
-    -- Left terminal (F2)
-    local term_left = Terminal:new({
+    -- Horizontal terminal (F2)
+    local term_horizontal = Terminal:new({
       cmd = vim.o.shell,
       direction = "horizontal",
+      size = function(term)
+        return math.floor(vim.o.lines * 0.3)
+      end,
       hidden = true,
       count = 2,
+      -- Set current working directory
+      cwd = vim.fn.getcwd(),
+    })
+
+    -- Additional horizontal terminal (F3)
+    local term_horizontal2 = Terminal:new({
+      cmd = vim.o.shell,
+      direction = "horizontal",
+      size = function(term)
+        return math.floor(vim.o.lines * 0.3)
+      end,
+      hidden = true,
+      count = 3,
+      -- Set current working directory
+      cwd = vim.fn.getcwd(),
     })
 
     -- Key mappings
@@ -51,7 +73,11 @@ return {
     end, { noremap = true, silent = true })
 
     vim.keymap.set({ "n", "t" }, "<F2>", function()
-      term_left:toggle()
+      term_horizontal:toggle()
+    end, { noremap = true, silent = true })
+
+    vim.keymap.set({ "n", "t" }, "<F3>", function()
+      term_horizontal2:toggle()
     end, { noremap = true, silent = true })
   end,
 }
